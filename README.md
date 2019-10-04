@@ -13,10 +13,11 @@ You must provide:
 - `tag`: The tag to uploaded into. If you want the current event's tag, use `${{ github.ref }}`
 - `overwrite`: If an asset with the same name already exists, overwrite it.
 
+
 Optional Arguments
 
- - `file_glob`: If set to true, the file argument can be a glob pattern (`asset_name` is ignored in this case)
-
+ - `draft`: The release will be marked as a draft if this is set
+ - `file_glob`: If set to true, the file argument can be a glob pattern (asset_name is ignored in this case)
 ## Usage
 
 This usage assumes you want to build on tag creations only.
@@ -97,9 +98,11 @@ jobs:
         tag: ${{ github.ref }}
 ```
 
-Example with `file_glob`:
+Example with file_glob and draft
+
 ```yaml
 name: Publish
+
 on:
   push:
     tags:
@@ -122,5 +125,6 @@ jobs:
         file: target/release/my*
         tag: ${{ github.ref }}
         overwrite: true
+        draft: true
         file_glob: true
 ```

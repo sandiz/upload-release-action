@@ -5,7 +5,7 @@ import * as path from 'path';
 
 const glob = require("glob")
 
-async function get_release_by_tag(tag: string, octokit: any, context: any): Promise<any> {
+async function get_release_by_tag(tag: string, octokit: any, context: any, draft: boolean): Promise<any> {
     try {
         core.debug(`Getting release by tag ${tag}.`);
         return await octokit.repos.getReleaseByTag({
@@ -15,10 +15,26 @@ async function get_release_by_tag(tag: string, octokit: any, context: any): Prom
     } catch (error) {
         // If this returns 404, we need to create the release first.
         if (error.status === 404) {
+            // if there is a draft release already, use that 
+            if (draft) {
+                const releases = await octokit.repos.listReleases({
+                    ...context.repo,
+                });
+                core.debug(`Found ${releases.data.length} releases, looking for draft release to piggyback..`)
+                for (let i = 0; i < releases.data.length; i += 1) {
+                    const release = releases.data[i];
+                    if (release.draft) {
+                        core.debug(`Found draft release in repo, tag_name: ${release.tag_name}`)
+                        return { data: release };
+                    }
+                }
+            }
+            // otherwise create a release (draft if necessary)
             core.debug(`Release for tag ${tag} doesn't exist yet so we'll create it now.`)
             return await octokit.repos.createRelease({
                 ...context.repo,
                 tag_name: tag,
+                draft,
             })
         } else {
             throw error;
@@ -75,10 +91,11 @@ async function run() {
         const file_glob = core.getInput('file_glob');
         const tag = core.getInput('tag', { required: true }).replace("refs/tags/", "");
         const overwrite = core.getInput('overwrite');
+        const draft = core.getInput('draft');
 
         const octokit = new github.GitHub(token);
         const context = github.context;
-        const release = await get_release_by_tag(tag, octokit, context);
+        const release = await get_release_by_tag(tag, octokit, context, draft === "true");
 
         if (file_glob === "true") {
             const files = glob.sync(file);
