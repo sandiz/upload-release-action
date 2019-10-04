@@ -13,10 +13,18 @@ You must provide:
 - `tag`: The tag to uploaded into. If you want the current event's tag, use `${{ github.ref }}`
 - `overwrite`: If an asset with the same name already exists, overwrite it.
 
+<<<<<<< HEAD
 Optional Arguments
 
  - `file_glob`: If set to true, the file argument can be a glob pattern (asset_name is ignored in this case)
 
+=======
+
+Optional Arguments
+
+ - `draft`: The release will be marked as a draft if this is set
+ - `file_glob`: If set to true, the file argument can be a glob pattern (asset_name is ignored in this case)
+>>>>>>> af317de... update README, add support for reusing draft release
 ## Usage
 
 This usage assumes you want to build on tag creations only.
@@ -123,4 +131,34 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
+```
+
+
+Example with draft:
+```yaml
+name: Publish
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  build:
+    name: Publish binaries
+    runs-on: ubuntu-latest
+    steps:
+    - uses: hecrj/setup-rust-action@v1-release
+      with:
+        rust-version: stable
+    - uses: actions/checkout@v1
+    - name: Build
+      run: cargo build --release
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/release/my*
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+        draft: true
 ```
