@@ -13,18 +13,11 @@ You must provide:
 - `tag`: The tag to uploaded into. If you want the current event's tag, use `${{ github.ref }}`
 - `overwrite`: If an asset with the same name already exists, overwrite it.
 
-<<<<<<< HEAD
-Optional Arguments
-
- - `file_glob`: If set to true, the file argument can be a glob pattern (asset_name is ignored in this case)
-
-=======
 
 Optional Arguments
 
  - `draft`: The release will be marked as a draft if this is set
  - `file_glob`: If set to true, the file argument can be a glob pattern (asset_name is ignored in this case)
->>>>>>> af317de... update README, add support for reusing draft release
 ## Usage
 
 This usage assumes you want to build on tag creations only.
