@@ -21,8 +21,7 @@ async function get_release_by_tag(tag: string, octokit: any, context: any, draft
                     ...context.repo,
                 });
                 core.debug(`Found ${releases.data.length} releases, looking for draft release to piggyback..`)
-                for (let i = 0; i < releases.data.length; i += 1) {
-                    const release = releases.data[i];
+                for (let release of releases.data) {
                     if (release.draft) {
                         core.debug(`Found draft release in repo, tag_name: ${release.tag_name}`)
                         return { data: release };
